@@ -1,0 +1,50 @@
+services:
+  cefis-code-review-front:
+    container_name: ccr-front
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+    working_dir: /app
+    networks:
+      - cefis-code-review
+    stdin_open: true
+    tty: true
+    command: npm run dev
+
+  cefis-code-review-api:
+    container_name: ccr-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "3042:3042"
+    volumes:
+      - ./api:/app
+    networks:
+      - cefis-code-review
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: npm run start:dev
+
+  cefis-code-review-redis:
+    container_name: ccr-redis
+    image: redis:7.0-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - cefis-code-review
+    volumes:
+      - redis:/data
+
+volumes:
+  redis:
+    driver: local
+
+networks:
+  cefis-code-review:
+    driver: bridge
